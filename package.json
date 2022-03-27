@@ -1,0 +1,25 @@
+{
+  "name": "bot_bet365",
+  "version": "1.0.0",
+  "description": "Bot BET365",
+  "main": "index.js",
+  "scripts": {
+    "test": "mocha --watch"
+  },
+  "author": "PEAL",
+  "license": "ISC",
+  "dependencies": {
+    "axios": "^0.26.1",
+    "dotenv": "^16.0.0",
+    "node-telegram-bot-api": "^0.56.0",
+    "node-watch": "^0.7.3",
+    "nodemon": "^2.0.15",
+    "puppeteer": "^13.5.0",
+    "readline-sync": "^1.4.10",
+    "telegraf": "^3.39.0"
+  },
+  "devDependencies": {
+    "chai": "^4.3.6",
+    "chai-http": "^4.3.0"
+  }
+}

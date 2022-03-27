@@ -1,0 +1,24 @@
+Sequência de cor: ocorre quando vem uma sequência de 12 números vermelhos ou 12 números pretos. Nesse caso iremos fazer uma entrada de operação na cor oposta da sequência. Se existe uma sequência de números vermelhos, quando o sinal indicar, a operação será feita nos números pretos. Caso seja uma sequência de números pretos, iremos fazer a entrada nos números vermelhos.
+
+Sequência de pares ou ímpares: ocorre quando vem uma sequência de 12 números pares ou 12 números ímpares. Caso aconteça iremos fazer uma entrada de operação no oposto da sequência. Se existe uma sequência de números pares, quando o sinal indicar, a operação será feita nos números ímpares. Caso seja uma sequência de números ímpares, iremos fazer a entrada nos números pares.
+
+Sequência de números altos ou baixos: ocorre quando vem uma sequência de 12 números altos (entre 18 e 36) ou 12 números baixos (entre 1 e 18). Caso aconteça iremos fazer uma entrada de operação no oposto da sequência. Se há uma sequência de números altos, quando o sinal indicar, a operação será feita nos números baixos, ou vice-versa.
+
+Sequência de números na mesma dúzia: ocorre quando vem uma sequência de 7 (e não 12 como as anteriores) números da mesma dúzia (Lembrando que Primeira Dúzia contém os números entre 1 e 12, Segunda Dúzia contém entre 13 e 24, e Terceira Dúzia contém entre 25 e 36). Caso aconteça iremos fazer uma entrada de operação nas outras duas dúzias esperando que o próximo número não venha na mesma dúzia, ou seja, fugindo do padrão. Se há uma sequência de números na primeira dúzia por exemplo, quando o sinal indicar, a operação será feita na segunda dúzia e também na terceira dúzia.
+
+11 - Analizando, Nome Roleta, Frequência de Cor
+12 - números - Confirmação - Roleta 
+caso não aconteça a frequÊncia ele apaga a mensagem.
+13 - não entrou
+
+só pode mandar uma da regras 
+
+Fazer gale 1, perdemos 
+Fazer gale 2, perdemos
+
+
+RED |3,13,10 
+
+TEMPO: 24h
+
+
