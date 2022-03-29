@@ -20,16 +20,23 @@ const FREQUENCIA = {
     Seis: 6,
     Sete: 7,
     Oito: 8,
+    Nove: 9,
+    Dez: 10,
     Onze: 11,
     Doze: 12,
-    Treze: 13
+    Treze: 13,
+    Catorze: 14,
+    Quinze: 15,
+    Dezesseis: 16,
 }
 
 const TIPO_MENSAGEM = {
     Analise: 'analise',
     Info: 'info',
     Falha: 'falha',
-    Confirmacao: 'successo'
+    Confirmacao: 'successo',
+    Gale: 'gale',
+    Win: 'win'
 }
 
 var nomeRoleta = '';
@@ -63,16 +70,23 @@ function SequenciaCor(cor) {
         frequenciaCorVermelha = 0;
     }
 
-    let tipo = '', msg = '';
+    var tipo = '', msg = '';
+    let ganhou = false;
     if (ultimaFrequenciaCorPreta != _frequenciaCorPreta) {
         tipo = resultadoPreta?.tipo;
-        msg = resultadoPreta?.mensagem;
+        msg = resultadoPreta?.msg;
+
+        ganhou = VerificarSeGanhou(ultimaFrequenciaCorVermelha);
     }
 
     if (ultimaFrequenciaCorVermelha != _frequenciaCorVermelha) {
         tipo = resultadoVermelha?.tipo;
-        msg = resultadoVermelha?.mensagem;
+        msg = resultadoVermelha?.msg;
+
+        if (!ganhou) ganhou = VerificarSeGanhou(ultimaFrequenciaCorPreta);
     }
+
+    if (ganhou) { tipo = ganhou.tipo; msg = ganhou.msg; Restart(); }
 
     ultimaFrequenciaCorPreta = _frequenciaCorPreta;
     ultimaFrequenciaCorVermelha = _frequenciaCorVermelha;
@@ -115,15 +129,20 @@ function SequenciaNumeroParImpar(numero) {
     }
 
     let tipo = '', msg = '';
+    let ganhou = false;
     if (ultimaFrequenciaNumeroPar != _frequenciaNumeroPar) {
         tipo = resultadoPar?.tipo;
-        msg = resultadoPar?.mensagem;
+        msg = resultadoPar?.msg;
+        if (!ganhou) ganhou = VerificarSeGanhou(ultimaFrequenciaNumeroImpar);
     }
 
     if (ultimaFrequenciaNumeroImpar != _frequenciaNumeroImpar) {
         tipo = resultadoImpar?.tipo;
-        msg = resultadoImpar?.mensagem;
+        msg = resultadoImpar?.msg;
+        if (!ganhou) ganhou = VerificarSeGanhou(ultimaFrequenciaNumeroPar);
     }
+
+    if (ganhou) { tipo = ganhou.tipo; msg = ganhou.msg; Restart(); }
 
     ultimaFrequenciaNumeroPar = _frequenciaNumeroPar;
     ultimaFrequenciaNumeroImpar = _frequenciaNumeroImpar;
@@ -164,21 +183,26 @@ function SequenciaNumeroBaixoAlto(numero) {
     let resultadoNumeroBaixo = VerificarFrequenciaDose(frequenciaNumeroBaixo, ESTRATEGIA.NumeroBaixo);
     let resultadoNumeroAlto = VerificarFrequenciaDose(frequenciaNumeroAlto, ESTRATEGIA.NumeroAlto);
 
-    if (resultadoNumeroBaixo?.tipo == 'falha' || resultadoNumeroAlto?.tipo == 'falha') {
+    if (resultadoNumeroBaixo?.tipo == TIPO_MENSAGEM.Falha || resultadoNumeroAlto?.tipo == TIPO_MENSAGEM.Falha) {
         frequenciaNumeroBaixo = 0;
         frequenciaNumeroAlto = 0;
     }
 
     let tipo = '', msg = '';
+    let ganhou = false;
     if (ultimaFrequenciaNumeroBaixo != _frequenciaNumeroBaixo) {
         tipo = resultadoNumeroBaixo?.tipo;
-        msg = resultadoNumeroBaixo?.mensagem;
+        msg = resultadoNumeroBaixo?.msg;
+        if (!ganhou) ganhou = VerificarSeGanhou(ultimaFrequenciaNumeroAlto);
     }
 
     if (ultimaFrequenciaNumeroAlto != _frequenciaNumeroAlto) {
         tipo = resultadoNumeroAlto?.tipo;
-        msg = resultadoNumeroAlto?.mensagem;
+        msg = resultadoNumeroAlto?.msg;
+        if (!ganhou) ganhou = VerificarSeGanhou(ultimaFrequenciaNumeroBaixo);
     }
+
+    if (ganhou) { tipo = ganhou.tipo; msg = ganhou.msg; Restart(); }
 
     ultimaFrequenciaNumeroBaixo = _frequenciaNumeroBaixo;
     ultimaFrequenciaNumeroAlto = _frequenciaNumeroAlto;
@@ -228,27 +252,33 @@ function SequenciaNumeroMesmaDuziaColuna(numero) {
     let resultadoColuna2 = VerificarFrequenciaSete(frequenciaSegundaDuziaColuna, ESTRATEGIA.NumeroMesmaDuziaColuna2);
     let resultadoColuna3 = VerificarFrequenciaSete(frequenciaTerceiraDuziaColuna, ESTRATEGIA.NumeroMesmaDuziaColuna3);
 
-    if (resultadoColuna1?.tipo == 'falha' || resultadoColuna2?.tipo == 'falha' || resultadoColuna3?.tipo == 'falha') {
+    if (resultadoColuna1?.tipo == TIPO_MENSAGEM.Falha || resultadoColuna2?.tipo == TIPO_MENSAGEM.Falha || resultadoColuna3?.tipo == TIPO_MENSAGEM.Falha) {
         frequenciaPrimeiraDuziaColuna = 0;
         frequenciaSegundaDuziaColuna = 0;
         frequenciaTerceiraDuziaColuna = 0;
     }
 
-    let tipo = '', msg = '';
+    let tipo = TIPO_MENSAGEM.Info, msg = 'Analisando...';
+    let ganhou = false;
     if (ultimaFrequenciaPrimeiraDuziaColuna != _frequenciaPrimeiraDuziaColuna) {
         tipo = resultadoColuna1?.tipo;
-        msg = resultadoColuna1?.mensagem;
+        msg = resultadoColuna1?.msg;
+        if (!ganhou) ganhou = VerificarSeGanhou([ultimaFrequenciaSegundaDuziaColuna, ultimaFrequenciaTerceiraDuziaColuna], 'sete');
     }
 
     if (ultimaFrequenciaSegundaDuziaColuna != _frequenciaSegundaDuziaColuna) {
         tipo = resultadoColuna2?.tipo;
-        msg = resultadoColuna2?.mensagem;
+        msg = resultadoColuna2?.msg;
+        if (!ganhou) ganhou = VerificarSeGanhou([ultimaFrequenciaPrimeiraDuziaColuna, ultimaFrequenciaTerceiraDuziaColuna], 'sete');
     }
 
     if (ultimaFrequenciaTerceiraDuziaColuna != _frequenciaTerceiraDuziaColuna) {
         tipo = resultadoColuna3?.tipo;
-        msg = resultadoColuna3?.mensagem;
+        msg = resultadoColuna3?.msg;
+        if (!ganhou) ganhou = VerificarSeGanhou([ultimaFrequenciaPrimeiraDuziaColuna, ultimaFrequenciaSegundaDuziaColuna], 'sete');
     }
+
+    if (ganhou) { tipo = ganhou.tipo; msg = ganhou.msg; Restart(); }
 
     ultimaFrequenciaPrimeiraDuziaColuna = _frequenciaPrimeiraDuziaColuna;
     ultimaFrequenciaSegundaDuziaColuna = _frequenciaSegundaDuziaColuna;
@@ -299,27 +329,34 @@ function SequenciaNumeroMesmaDuziaLinha(numero) {
     var resultadoLinha2 = VerificarFrequenciaSete(frequenciaSegundaDuziaLinha, ESTRATEGIA.NumeroMesmaDuziaLinha2);
     var resultadoLinha3 = VerificarFrequenciaSete(frequenciaTerceiraDuziaLinha, ESTRATEGIA.NumeroMesmaDuziaLinha3);
 
-    if (resultadoLinha1?.tipo == 'falha' || resultadoLinha2?.tipo == 'falha' || resultadoLinha3?.tipo == 'falha') {
+    if (resultadoLinha1?.tipo == TIPO_MENSAGEM.Falha || resultadoLinha2?.tipo == TIPO_MENSAGEM.Falha || resultadoLinha3?.tipo == TIPO_MENSAGEM.Falha) {
         frequenciaPrimeiraDuziaLinha = 0;
         frequenciaSegundaDuziaLinha = 0;
         frequenciaTerceiraDuziaLinha = 0;
     }
 
     let tipo = '', msg = '';
+    let ganhou = false;
     if (ultimaFrequenciaPrimeiraDuziaLinha != _frequenciaPrimeiraDuziaLinha) {
         tipo = resultadoLinha1?.tipo;
-        msg = resultadoLinha1?.mensagem;
+        msg = resultadoLinha1?.msg;
+        if (!ganhou) ganhou = VerificarSeGanhou([ultimaFrequenciaSegundaDuziaLinha, ultimaFrequenciaTerceiraDuziaLinha], 'sete');
     }
 
     if (ultimaFrequenciaSegundaDuziaLinha != _frequenciaSegundaDuziaLinha) {
         tipo = resultadoLinha2?.tipo;
-        msg = resultadoLinha2?.mensagem;
+        msg = resultadoLinha2?.msg;
+        if (!ganhou) ganhou = VerificarSeGanhou([ultimaFrequenciaPrimeiraDuziaLinha, ultimaFrequenciaTerceiraDuziaLinha], 'sete');
+
     }
 
     if (ultimaFrequenciaTerceiraDuziaLinha != _frequenciaTerceiraDuziaLinha) {
         tipo = resultadoLinha3?.tipo;
-        msg = resultadoLinha3?.mensagem;
+        msg = resultadoLinha3?.msg;
+        if (!ganhou) ganhou = VerificarSeGanhou([ultimaFrequenciaPrimeiraDuziaLinha, ultimaFrequenciaSegundaDuziaLinha], 'sete');
     }
+
+    if (ganhou) { tipo = ganhou.tipo; msg = ganhou.msg; Restart(); }
 
     ultimaFrequenciaPrimeiraDuziaLinha = _frequenciaPrimeiraDuziaLinha;
     ultimaFrequenciaSegundaDuziaLinha = _frequenciaSegundaDuziaLinha;
@@ -339,11 +376,17 @@ function SequenciaNumeroMesmaDuziaLinha(numero) {
 function VerificarFrequenciaDose(totalFrequencia, estrategia) {
     switch (totalFrequencia) {
         case FREQUENCIA.Onze:
-            return MensagemAnalise(nomeRoleta, estrategia.msg, estrategia.entrada);
+            return MensagemAnalisando(nomeRoleta, estrategia);
         case FREQUENCIA.Doze:
-            return MensagemConfirmacao(nomeRoleta, estrategia.msg);
+            return MensagemAnaliseConfirmada(nomeRoleta, estrategia);
         case FREQUENCIA.Treze:
-            return MensagemFalha(nomeRoleta, estrategia.msg);
+            return MensagemAnaliseConfirmada(nomeRoleta, estrategia);
+        case FREQUENCIA.Catorze:
+            return MensagemGale(1);
+        case FREQUENCIA.Quinze:
+            return MensagemGale(2);
+        case FREQUENCIA.Dezesseis:
+            return MensagemFalha();
         default:
             return null;
     }
@@ -352,37 +395,77 @@ function VerificarFrequenciaDose(totalFrequencia, estrategia) {
 function VerificarFrequenciaSete(totalFrequencia, estrategia) {
     switch (totalFrequencia) {
         case FREQUENCIA.Seis:
-            return MensagemAnalise(nomeRoleta, estrategia.msg, estrategia.entrada);
+            return MensagemAnalisando(nomeRoleta, estrategia);
         case FREQUENCIA.Sete:
-            return MensagemConfirmacao(nomeRoleta, estrategia.msg);
+            return MensagemAnaliseConfirmada(nomeRoleta, estrategia);
         case FREQUENCIA.Oito:
-            return MensagemFalha(nomeRoleta, estrategia.msg);
+            return MensagemAnaliseConfirmada(nomeRoleta, estrategia);
+        case FREQUENCIA.Nove:
+            return MensagemGale(1);
+        case FREQUENCIA.Dez:
+            return MensagemGale(2);
+        case FREQUENCIA.Onze:
+            return MensagemFalha();
         default:
             return null;
     }
 }
 
-//Manda a mensagem quando a frequência for 11 ou 6
-function MensagemAnalise(roleta, estarategia, entrada) {
+function VerificarSeGanhou(ultimaFrequencia, frequenciaGanha = 'dose') {
+    if (frequenciaGanha != 'dose' && frequenciaGanha != 'sete')
+        return { sucesso: false, erro: 'Frequência ganha inválido' };
+
+    const FREQUENCIAS_GANHAS = {
+        dose: [13, 14, 15],
+        sete: [8, 9, 10],
+    }
+
+    let win = false;
+    FREQUENCIAS_GANHAS[frequenciaGanha].forEach(valor => {
+        if (Array.isArray(ultimaFrequencia)) {
+            ultimaFrequencia.forEach(frequencia => {
+                if (frequencia == valor) { win = true; return; }
+            });
+        } else {
+            if (ultimaFrequencia == valor) { win = true; return; }
+        }
+    });
+
+    return win ? MensagemWin() : false;
+}
+
+function MensagemAnalisando(roleta, estarategia) {
     return {
         tipo: TIPO_MENSAGEM.Analise,
-        mensagem: `ANÁLISE CONFIRMADA\nRoleta: ${roleta} \nEstaratégia: ${estarategia} \nEntrar: ${entrada}`
+        msg: `ANALIZANDO \n\nRoleta: ${roleta} \n\nEstaratégia: ${estarategia.msg} \n\nEntrar quando confirmar`
     }
 }
 
-//Mandar mensagem quando a frequência for 12 ou 7
-function MensagemConfirmacao(roleta, estarategia) {
+function MensagemAnaliseConfirmada(roleta, estarategia) {
     return {
         tipo: TIPO_MENSAGEM.Confirmacao,
-        mensagem: `CONFIRMAÇÃO\nRoleta: ${roleta} \nEstaratégia: ${estarategia}`
+        msg: `ANÁLISE CONFIRMADA\n\nRoleta: ${roleta} \n\nEstaratégia: ${estarategia.msg} \n\nEntrar: ${estarategia.entrada}`
     }
 }
 
-//Mandar mensagem quando a frequência for 13 ou 8
-function MensagemFalha(roleta, estarategia) {
+function MensagemGale(numero) {
+    return {
+        tipo: TIPO_MENSAGEM.Gale,
+        msg: `Fazer gale ${numero}`
+    };
+}
+
+function MensagemWin() {
+    return {
+        tipo: TIPO_MENSAGEM.Win,
+        msg: `WIN`
+    };
+}
+
+function MensagemFalha() {
     return {
         tipo: TIPO_MENSAGEM.Falha,
-        mensagem: `NÃO ENTROU.\nRoleta: ${roleta} \nEstaratégia: ${estarategia}`
+        msg: `RED`
     };
 }
 
@@ -394,7 +477,7 @@ function AnalisarTodasRegras(valor, roleta = '') {
     let baixoAlto = SequenciaNumeroBaixoAlto(valor);
     let duziaColuna = SequenciaNumeroMesmaDuziaColuna(valor);
     let duziaLinha = SequenciaNumeroMesmaDuziaLinha(valor);
-    let tipo = 'Analisando...', msg = TIPO_MENSAGEM.Info;
+    let tipo = TIPO_MENSAGEM.Info, msg = 'Analisando...';
 
     if (cor.Mensagem?.tipo && cor.Mensagem?.tipo != TIPO_MENSAGEM.Info) {
         tipo = cor.Mensagem?.tipo;
@@ -471,7 +554,7 @@ function Restart() {
 class Regras {
     constructor(roleta = '') {
         Restart();
-        
+
         nomeRoleta = roleta;
     }
 
@@ -491,5 +574,8 @@ module.exports = {
     SequenciaNumeroMesmaDuziaLinha,
     AnalisarTodasRegras,
     Restart,
+    MensagemAnalisando,
+    MensagemAnaliseConfirmada,
+    MensagemFalha,
     Regras
 }

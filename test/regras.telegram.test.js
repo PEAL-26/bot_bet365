@@ -2,15 +2,40 @@ const telegram = require('../src/telegram-api');
 const regras = require('../src/regras');
 var todosValores = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 'preta', 'vermelha'];
 var ultimaMensagemId = 0;
-for (var i = 0; i <= 100; i++) {
-    let valorAleatorio = Math.floor(Math.random() * todosValores.length);
-    var resultado = regras.AnalisarTodasRegras(todosValores[valorAleatorio]);
 
-    if (resultado.Mensagem.tipo != 'info') {
-        var resultadoTelegram = await telegram.enviarMensagem(resultado.Mensagem.msg);
-    }
+function delay(n) {
+    return new Promise(function (resolve) {
+        setTimeout(resolve, n * 1000);
+    });
+}
 
-    ultimaMensagemId = resultadoTelegram.message_id;
+async function mensagem() {
+    let analise = regras.MensagemAnalise('Roleta Teste', 'Teste', 'Teste');
+    let confirmacao = regras.MensagemConfirmacao('Roleta Teste', 'Teste', 'Teste');
+    let falha = regras.MensagemFalha('Roleta Teste', 'Teste');
 
+    await telegram.enviarMensagem(analise.mensagem);
+    await telegram.enviarMensagem(confirmacao.mensagem);
+    await telegram.enviarMensagem(falha.mensagem);
 
 }
+
+async function testar() {
+    for (var i = 0; i <= 30; i++) {
+
+        await delay(1.5);
+
+        let valorAleatorio = Math.floor(Math.random() * todosValores.length);
+        let resultado = regras.AnalisarTodasRegras(todosValores[valorAleatorio], 'Roleta Teste');
+
+        if (resultado.Mensagem.tipo != 'info') {
+            var resultadoTelegram = await telegram.enviarMensagem(resultado.Mensagem.msg);
+        }
+
+        //ultimaMensagemId = resultadoTelegram?.message_id;
+
+    }
+}
+
+testar();
+//mensagem();

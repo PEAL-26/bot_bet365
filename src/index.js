@@ -88,14 +88,3 @@ async function Start() {
 
 //Start();
 
-
-
-
-var regra = new regras.Regras();
-regra.AnalisarTodasRegras('preta', 'teste')
-var resultado = regra.AnalisarTodasRegras('preta', 'teste')
-console.log(resultado);
-
-var regra = new regras.Regras();
-var resultado = regra.AnalisarTodasRegras('preta', 'teste')
-console.log(resultado);
