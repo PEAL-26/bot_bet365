@@ -8,12 +8,12 @@ const ESTRATEGIA = {
     NumeroImpar: { msg: 'Sequência de Números Ímpares', entrada: 'Par' },
     NumeroBaixo: { msg: 'Sequência de Números Baixos', entrada: 'Alto' },
     NumeroAlto: { msg: 'Sequência de Números Altos', entrada: 'Baixo' },
-    NumeroMesmaDuziaColuna1: { msg: 'Sequência de Números da Mesma Dúzia - Coluna 1st', entrada: 'Coluna 2nd ou 3rd' },
-    NumeroMesmaDuziaColuna2: { msg: 'Sequência de Números da Mesma Dúzia - Coluna 2nd', entrada: 'Coluna 1st ou 3rd' },
-    NumeroMesmaDuziaColuna3: { msg: 'Sequência de Números da Mesma Dúzia - Coluna 3rd', entrada: 'Coluna 1st ou 2nd' },
-    NumeroMesmaDuziaLinha1: { msg: 'Sequência de Números da Mesma Dúzia - Linha 1st', entrada: 'Linha 2nd ou 3rd' },
-    NumeroMesmaDuziaLinha2: { msg: 'Sequência de Números da Mesma Dúzia - Linha 2nd', entrada: 'Linha 1st ou 3rd' },
-    NumeroMesmaDuziaLinha3: { msg: 'Sequência de Números da Mesma Dúzia - Linha 3rd', entrada: 'Linha 1st ou 2nd' },
+    NumeroMesmaDuziaColuna1: { msg: 'Sequência de Números da Mesma Dúzia - Coluna 1st', entrada: 'Coluna 2nd e 3rd' },
+    NumeroMesmaDuziaColuna2: { msg: 'Sequência de Números da Mesma Dúzia - Coluna 2nd', entrada: 'Coluna 1st e 3rd' },
+    NumeroMesmaDuziaColuna3: { msg: 'Sequência de Números da Mesma Dúzia - Coluna 3rd', entrada: 'Coluna 1st e 2nd' },
+    NumeroMesmaDuziaLinha1: { msg: 'Sequência de Números da Mesma Dúzia - Linha 1st', entrada: 'Linha 2nd e 3rd' },
+    NumeroMesmaDuziaLinha2: { msg: 'Sequência de Números da Mesma Dúzia - Linha 2nd', entrada: 'Linha 1st e 3rd' },
+    NumeroMesmaDuziaLinha3: { msg: 'Sequência de Números da Mesma Dúzia - Linha 3rd', entrada: 'Linha 1st e 2nd' },
 }
 
 const FREQUENCIA = {
@@ -34,9 +34,10 @@ const TIPO_MENSAGEM = {
     Analise: 'analise',
     Info: 'info',
     Falha: 'falha',
-    Confirmacao: 'successo',
+    Confirmacao: 'confirmacao',
     Gale: 'gale',
-    Win: 'win'
+    Win: 'win',
+    Erro: 'erro',
 }
 
 var nomeRoleta = '';
@@ -45,18 +46,17 @@ var frequenciaCorPreta = 0;
 var ultimaFrequenciaCorPreta = 0;
 var frequenciaCorVermelha = 0;
 var ultimaFrequenciaCorVermelha = 0;
-function SequenciaCor(cor) {
-    if (!isNaN(cor))
-        return { Preta: frequenciaCorPreta, Vermelha: frequenciaCorVermelha };
+function SequenciaCor(numero) {
+    let numeroValido = VerificarNumeroValido(numero);
+    if (numeroValido != true) return numeroValido;
 
-    let _cor = cor.toLowerCase()
-    if (_cor != 'vermelha' && _cor != 'preta')
-        return { sucesso: false, erro: 'Cor inválida.[vermelha|preta]' };
+    let vermelha = [1, 3, 5, 7, 9, 12, 14, 16, 18, 19, 21, 23, 25, 27, 30, 32, 34, 36];
+    let preta = [2, 4, 6, 8, 10, 11, 13, 15, 17, 20, 22, 24, 26, 28, 29, 31, 33, 35];
 
-    if (_cor == 'vermelha')
+    if (vermelha.includes(numero))
         frequenciaCorVermelha++;
 
-    if (_cor == 'preta')
+    if (preta.includes(numero))
         frequenciaCorPreta++;
 
     let _frequenciaCorPreta = frequenciaCorPreta;
@@ -70,23 +70,23 @@ function SequenciaCor(cor) {
         frequenciaCorVermelha = 0;
     }
 
-    var tipo = '', msg = '';
+    let tipo = TIPO_MENSAGEM.Info, msg = 'Analisando...';
     let ganhou = false;
     if (ultimaFrequenciaCorPreta != _frequenciaCorPreta) {
-        tipo = resultadoPreta?.tipo;
-        msg = resultadoPreta?.msg;
+        tipo = resultadoPreta?.tipo ?? tipo;
+        msg = resultadoPreta?.msg ?? msg;
 
         ganhou = VerificarSeGanhou(ultimaFrequenciaCorVermelha);
     }
 
     if (ultimaFrequenciaCorVermelha != _frequenciaCorVermelha) {
-        tipo = resultadoVermelha?.tipo;
-        msg = resultadoVermelha?.msg;
+        tipo = resultadoVermelha?.tipo ?? tipo;
+        msg = resultadoVermelha?.msg ?? msg;
 
         if (!ganhou) ganhou = VerificarSeGanhou(ultimaFrequenciaCorPreta);
     }
 
-    if (ganhou) { tipo = ganhou.tipo; msg = ganhou.msg; Restart(); }
+    if (ganhou) { tipo = ganhou.tipo; msg = ganhou.msg; }
 
     ultimaFrequenciaCorPreta = _frequenciaCorPreta;
     ultimaFrequenciaCorVermelha = _frequenciaCorVermelha;
@@ -94,9 +94,9 @@ function SequenciaCor(cor) {
     return {
         Preta: _frequenciaCorPreta,
         Vermelha: _frequenciaCorVermelha,
-        Mensagem: {
-            tipo: tipo ?? TIPO_MENSAGEM.Info,
-            msg: tipo ? msg : 'Analisando...'
+        Status: {
+            tipo: tipo,
+            msg: msg
         }
     };
 }
@@ -106,11 +106,8 @@ var ultimaFrequenciaNumeroPar = 0
 var frequenciaNumeroImpar = 0
 var ultimaFrequenciaNumeroImpar = 0
 function SequenciaNumeroParImpar(numero) {
-    if (isNaN(numero))
-        return { sucesso: false, erro: `O valor inserido não é um número.. [${NUMERO_MININO}...${NUMERO_MAXIMO}]` };
-
-    if (numero < NUMERO_MININO && numero > NUMERO_MAXIMO)
-        return { sucesso: false, erro: `Número inválido. [${NUMERO_MININO}...${NUMERO_MAXIMO}]` };
+    let numeroValido = VerificarNumeroValido(numero);
+    if (numeroValido != true) return numeroValido;
 
     if (numero % 2 == 0)
         frequenciaNumeroPar++;
@@ -128,21 +125,21 @@ function SequenciaNumeroParImpar(numero) {
         frequenciaNumeroImpar = 0;
     }
 
-    let tipo = '', msg = '';
+    var tipo = TIPO_MENSAGEM.Info, msg = 'Analisando...';
     let ganhou = false;
     if (ultimaFrequenciaNumeroPar != _frequenciaNumeroPar) {
-        tipo = resultadoPar?.tipo;
-        msg = resultadoPar?.msg;
+        tipo = resultadoPar?.tipo ?? tipo;
+        msg = resultadoPar?.msg ?? msg;
         if (!ganhou) ganhou = VerificarSeGanhou(ultimaFrequenciaNumeroImpar);
     }
 
     if (ultimaFrequenciaNumeroImpar != _frequenciaNumeroImpar) {
-        tipo = resultadoImpar?.tipo;
-        msg = resultadoImpar?.msg;
+        tipo = resultadoImpar?.tipo ?? tipo;
+        msg = resultadoImpar?.msg ?? msg;
         if (!ganhou) ganhou = VerificarSeGanhou(ultimaFrequenciaNumeroPar);
     }
 
-    if (ganhou) { tipo = ganhou.tipo; msg = ganhou.msg; Restart(); }
+    if (ganhou) { tipo = ganhou.tipo; msg = ganhou.msg; }
 
     ultimaFrequenciaNumeroPar = _frequenciaNumeroPar;
     ultimaFrequenciaNumeroImpar = _frequenciaNumeroImpar;
@@ -150,9 +147,9 @@ function SequenciaNumeroParImpar(numero) {
     return {
         Par: _frequenciaNumeroPar,
         Impar: _frequenciaNumeroImpar,
-        Mensagem: {
-            tipo: tipo ?? TIPO_MENSAGEM.Info,
-            msg: tipo ? msg : 'Analisando...'
+        Status: {
+            tipo: tipo,
+            msg: msg
         }
     };
 }
@@ -162,11 +159,8 @@ var ultimaFrequenciaNumeroBaixo = 0
 var frequenciaNumeroAlto = 0
 var ultimaFrequenciaNumeroAlto = 0
 function SequenciaNumeroBaixoAlto(numero) {
-    if (isNaN(numero))
-        return { sucesso: false, erro: `O valor inserido não é um número.. [${NUMERO_MININO}...${NUMERO_MAXIMO}]` };
-
-    if (numero < NUMERO_MININO && numero > NUMERO_MAXIMO)
-        return { sucesso: false, erro: `Número inválido. [${NUMERO_MININO}...${NUMERO_MAXIMO}]` };
+    let numeroValido = VerificarNumeroValido(numero);
+    if (numeroValido != true) return numeroValido;
 
     let numerosBaixos = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18];
     let numerosAltos = [19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36];
@@ -188,21 +182,21 @@ function SequenciaNumeroBaixoAlto(numero) {
         frequenciaNumeroAlto = 0;
     }
 
-    let tipo = '', msg = '';
+    var tipo = TIPO_MENSAGEM.Info, msg = 'Analisando...';
     let ganhou = false;
     if (ultimaFrequenciaNumeroBaixo != _frequenciaNumeroBaixo) {
-        tipo = resultadoNumeroBaixo?.tipo;
-        msg = resultadoNumeroBaixo?.msg;
+        tipo = resultadoNumeroBaixo?.tipo ?? tipo;
+        msg = resultadoNumeroBaixo?.msg ?? msg;
         if (!ganhou) ganhou = VerificarSeGanhou(ultimaFrequenciaNumeroAlto);
     }
 
     if (ultimaFrequenciaNumeroAlto != _frequenciaNumeroAlto) {
-        tipo = resultadoNumeroAlto?.tipo;
-        msg = resultadoNumeroAlto?.msg;
+        tipo = resultadoNumeroAlto?.tipo ?? tipo;
+        msg = resultadoNumeroAlto?.msg ?? msg;
         if (!ganhou) ganhou = VerificarSeGanhou(ultimaFrequenciaNumeroBaixo);
     }
 
-    if (ganhou) { tipo = ganhou.tipo; msg = ganhou.msg; Restart(); }
+    if (ganhou) { tipo = ganhou.tipo; msg = ganhou.msg; }
 
     ultimaFrequenciaNumeroBaixo = _frequenciaNumeroBaixo;
     ultimaFrequenciaNumeroAlto = _frequenciaNumeroAlto;
@@ -210,9 +204,9 @@ function SequenciaNumeroBaixoAlto(numero) {
     return {
         NumeroBaixo: _frequenciaNumeroBaixo,
         NumeroAlto: _frequenciaNumeroAlto,
-        Mensagem: {
-            tipo: tipo ?? TIPO_MENSAGEM.Info,
-            msg: tipo ? msg : 'Analisando...'
+        Status: {
+            tipo: tipo,
+            msg: msg
         }
     };
 
@@ -225,11 +219,9 @@ var ultimaFrequenciaSegundaDuziaColuna = 0
 var frequenciaTerceiraDuziaColuna = 0
 var ultimaFrequenciaTerceiraDuziaColuna = 0
 function SequenciaNumeroMesmaDuziaColuna(numero) {
-    if (isNaN(numero))
-        return { sucesso: false, erro: `O valor inserido não é um número.. [${NUMERO_MININO}...${NUMERO_MAXIMO}]` };
 
-    if (numero < NUMERO_MININO && numero > NUMERO_MAXIMO)
-        return { sucesso: false, erro: `Número inválido. [${NUMERO_MININO}...${NUMERO_MAXIMO}]` };
+    let numeroValido = VerificarNumeroValido(numero);
+    if (numeroValido != true) return numeroValido;
 
     let primeiraDuzia = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12];
     let segundaDuzia = [13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24];
@@ -261,24 +253,24 @@ function SequenciaNumeroMesmaDuziaColuna(numero) {
     let tipo = TIPO_MENSAGEM.Info, msg = 'Analisando...';
     let ganhou = false;
     if (ultimaFrequenciaPrimeiraDuziaColuna != _frequenciaPrimeiraDuziaColuna) {
-        tipo = resultadoColuna1?.tipo;
-        msg = resultadoColuna1?.msg;
+        tipo = resultadoColuna1?.tipo ?? tipo;
+        msg = resultadoColuna1?.msg ?? msg;
         if (!ganhou) ganhou = VerificarSeGanhou([ultimaFrequenciaSegundaDuziaColuna, ultimaFrequenciaTerceiraDuziaColuna], 'sete');
     }
 
     if (ultimaFrequenciaSegundaDuziaColuna != _frequenciaSegundaDuziaColuna) {
-        tipo = resultadoColuna2?.tipo;
-        msg = resultadoColuna2?.msg;
+        tipo = resultadoColuna2?.tipo ?? tipo;
+        msg = resultadoColuna2?.msg ?? msg;
         if (!ganhou) ganhou = VerificarSeGanhou([ultimaFrequenciaPrimeiraDuziaColuna, ultimaFrequenciaTerceiraDuziaColuna], 'sete');
     }
 
     if (ultimaFrequenciaTerceiraDuziaColuna != _frequenciaTerceiraDuziaColuna) {
-        tipo = resultadoColuna3?.tipo;
-        msg = resultadoColuna3?.msg;
+        tipo = resultadoColuna3?.tipo ?? tipo;
+        msg = resultadoColuna3?.msg ?? msg;
         if (!ganhou) ganhou = VerificarSeGanhou([ultimaFrequenciaPrimeiraDuziaColuna, ultimaFrequenciaSegundaDuziaColuna], 'sete');
     }
 
-    if (ganhou) { tipo = ganhou.tipo; msg = ganhou.msg; Restart(); }
+    if (ganhou) { tipo = ganhou.tipo; msg = ganhou.msg; }
 
     ultimaFrequenciaPrimeiraDuziaColuna = _frequenciaPrimeiraDuziaColuna;
     ultimaFrequenciaSegundaDuziaColuna = _frequenciaSegundaDuziaColuna;
@@ -288,9 +280,9 @@ function SequenciaNumeroMesmaDuziaColuna(numero) {
         Coluna1st: _frequenciaPrimeiraDuziaColuna,
         Coluna2nd: _frequenciaSegundaDuziaColuna,
         Coluna3rd: _frequenciaTerceiraDuziaColuna,
-        Mensagem: {
-            tipo: tipo ?? TIPO_MENSAGEM.Info,
-            msg: tipo ? msg : 'Analisando...'
+        Status: {
+            tipo: tipo,
+            msg: msg
         }
     };
 }
@@ -302,14 +294,11 @@ var ultimaFrequenciaSegundaDuziaLinha = 0
 var frequenciaTerceiraDuziaLinha = 0
 var ultimaFrequenciaTerceiraDuziaLinha = 0
 function SequenciaNumeroMesmaDuziaLinha(numero) {
-    if (isNaN(numero))
-        return { sucesso: false, erro: `O valor inserido não é um número.. [${NUMERO_MININO}...${NUMERO_MAXIMO}]` };
-
-    if (numero < NUMERO_MININO && numero > NUMERO_MAXIMO)
-        return { sucesso: false, erro: `Número inválido. [${NUMERO_MININO}...${NUMERO_MAXIMO}]` };
+    let numeroValido = VerificarNumeroValido(numero);
+    if (numeroValido != true) return numeroValido;
 
     var primeiraDuzia = [1, 4, 7, 10, 13, 16, 19, 22, 25, 28, 31, 34];
-    var segundaDuzia = [1, 5, 8, 11, 14, 17, 20, 23, 26, 29, 32, 35];
+    var segundaDuzia = [2, 5, 8, 11, 14, 17, 20, 23, 26, 29, 32, 35];
     var terceiraDuzia = [3, 6, 9, 12, 15, 18, 21, 24, 27, 30, 33, 36];
 
     if (primeiraDuzia.includes(numero))
@@ -335,28 +324,28 @@ function SequenciaNumeroMesmaDuziaLinha(numero) {
         frequenciaTerceiraDuziaLinha = 0;
     }
 
-    let tipo = '', msg = '';
+    var tipo = TIPO_MENSAGEM.Info, msg = 'Analisando...';
     let ganhou = false;
     if (ultimaFrequenciaPrimeiraDuziaLinha != _frequenciaPrimeiraDuziaLinha) {
-        tipo = resultadoLinha1?.tipo;
-        msg = resultadoLinha1?.msg;
+        tipo = resultadoLinha1?.tipo ?? tipo;
+        msg = resultadoLinha1?.msg ?? msg;
         if (!ganhou) ganhou = VerificarSeGanhou([ultimaFrequenciaSegundaDuziaLinha, ultimaFrequenciaTerceiraDuziaLinha], 'sete');
     }
 
     if (ultimaFrequenciaSegundaDuziaLinha != _frequenciaSegundaDuziaLinha) {
-        tipo = resultadoLinha2?.tipo;
-        msg = resultadoLinha2?.msg;
+        tipo = resultadoLinha2?.tipo ?? tipo;
+        msg = resultadoLinha2?.msg ?? msg;
         if (!ganhou) ganhou = VerificarSeGanhou([ultimaFrequenciaPrimeiraDuziaLinha, ultimaFrequenciaTerceiraDuziaLinha], 'sete');
 
     }
 
     if (ultimaFrequenciaTerceiraDuziaLinha != _frequenciaTerceiraDuziaLinha) {
-        tipo = resultadoLinha3?.tipo;
-        msg = resultadoLinha3?.msg;
+        tipo = resultadoLinha3?.tipo ?? tipo;
+        msg = resultadoLinha3?.msg ?? msg;
         if (!ganhou) ganhou = VerificarSeGanhou([ultimaFrequenciaPrimeiraDuziaLinha, ultimaFrequenciaSegundaDuziaLinha], 'sete');
     }
 
-    if (ganhou) { tipo = ganhou.tipo; msg = ganhou.msg; Restart(); }
+    if (ganhou) { tipo = ganhou.tipo; msg = ganhou.msg; }
 
     ultimaFrequenciaPrimeiraDuziaLinha = _frequenciaPrimeiraDuziaLinha;
     ultimaFrequenciaSegundaDuziaLinha = _frequenciaSegundaDuziaLinha;
@@ -366,9 +355,9 @@ function SequenciaNumeroMesmaDuziaLinha(numero) {
         Linha1st: _frequenciaPrimeiraDuziaLinha,
         Linha2nd: _frequenciaSegundaDuziaLinha,
         Linha3rd: _frequenciaTerceiraDuziaLinha,
-        Mensagem: {
-            tipo: tipo ?? TIPO_MENSAGEM.Info,
-            msg: tipo ? msg : 'Analisando...'
+        Status: {
+            tipo: tipo,
+            msg: msg
         }
     };
 }
@@ -434,6 +423,16 @@ function VerificarSeGanhou(ultimaFrequencia, frequenciaGanha = 'dose') {
     return win ? MensagemWin() : false;
 }
 
+function VerificarNumeroValido(numero) {
+    if (isNaN(numero))
+        return { Status: { tipo: TIPO_MENSAGEM.Erro, msg: `O valor inserido não é um número.. [${NUMERO_MININO}...${NUMERO_MAXIMO}]` } };
+
+    if (numero < NUMERO_MININO && numero > NUMERO_MAXIMO)
+        return { Status: { tipo: TIPO_MENSAGEM.Erro, msg: `Número inválido. [${NUMERO_MININO}...${NUMERO_MAXIMO}]` } };
+
+    return true;
+}
+
 function MensagemAnalisando(roleta, estarategia) {
     return {
         tipo: TIPO_MENSAGEM.Analise,
@@ -469,6 +468,7 @@ function MensagemFalha() {
     };
 }
 
+var ultimaEstrategia = '';
 function AnalisarTodasRegras(valor, roleta = '') {
     nomeRoleta = roleta;
 
@@ -477,63 +477,76 @@ function AnalisarTodasRegras(valor, roleta = '') {
     let baixoAlto = SequenciaNumeroBaixoAlto(valor);
     let duziaColuna = SequenciaNumeroMesmaDuziaColuna(valor);
     let duziaLinha = SequenciaNumeroMesmaDuziaLinha(valor);
+
     let tipo = TIPO_MENSAGEM.Info, msg = 'Analisando...';
+    let status = [];
+    let win = false;
 
-    if (cor.Mensagem?.tipo && cor.Mensagem?.tipo != TIPO_MENSAGEM.Info) {
-        tipo = cor.Mensagem?.tipo;
-        msg = cor.Mensagem?.msg;
+    if (cor.Status?.tipo && cor.Status?.tipo != TIPO_MENSAGEM.Analise) {
+        tipo = cor.Status?.tipo;
+        msg = cor.Status?.msg;
+        status.push(cor.Status);
     }
 
-    if (parImpar?.Mensagem?.tipo && parImpar?.Mensagem?.tipo != TIPO_MENSAGEM.Info) {
-        tipo = parImpar?.Mensagem?.tipo;
-        msg = parImpar?.Mensagem?.msg;
+    if (parImpar?.Status?.tipo && parImpar?.Status?.tipo != TIPO_MENSAGEM.Analise) {
+        tipo = parImpar?.Status?.tipo;
+        msg = parImpar?.Status?.msg;
     }
 
-    if (baixoAlto?.Mensagem?.tipo && baixoAlto?.Mensagem?.tipo != TIPO_MENSAGEM.Info) {
-        tipo = baixoAlto?.Mensagem?.tipo;
-        msg = baixoAlto?.Mensagem?.msg;
-    }
+    // if (baixoAlto?.Status?.tipo && baixoAlto?.Status?.tipo != TIPO_MENSAGEM.Analise) {
+    //     tipo = baixoAlto?.Status?.tipo;
+    //     msg = baixoAlto?.Status?.msg;
+    // }
 
-    if (duziaColuna?.Mensagem?.tipo && duziaColuna?.Mensagem?.tipo != TIPO_MENSAGEM.Info) {
-        tipo = duziaColuna?.Mensagem?.tipo;
-        msg = duziaColuna?.Mensagem?.msg;
-    }
+    // if (duziaColuna?.Status?.tipo && duziaColuna?.Status?.tipo != TIPO_MENSAGEM.Analise) {
+    //     tipo = duziaColuna?.Status?.tipo;
+    //     msg = duziaColuna?.Status?.msg;
+    // }
 
-    if (duziaLinha?.Mensagem?.tipo && duziaLinha?.Mensagem?.tipo != TIPO_MENSAGEM.Info) {
-        tipo = duziaLinha?.Mensagem?.tipo;
-        msg = duziaLinha?.Mensagem?.msg;
-    }
+    // if (duziaLinha?.Status?.tipo && duziaLinha?.Status?.tipo != TIPO_MENSAGEM.Analise) {
+    //     tipo = duziaLinha?.Status?.tipo;
+    //     msg = duziaLinha?.Status?.msg;
+    // }
 
-    return {
-        Frequencias: {
-            Cor: {
-                Preta: frequenciaCorPreta,
-                vermelha: frequenciaCorVermelha
-            },
-            ParImpar: {
-                Par: frequenciaNumeroPar,
-                Impar: frequenciaNumeroImpar
-            },
-            BaixoAlto: {
-                NumeroBaixo: frequenciaNumeroBaixo,
-                NumeroAlto: frequenciaNumeroAlto
-            },
-            DuziaColuna: {
-                Coluna1st: frequenciaPrimeiraDuziaColuna,
-                Coluna2nd: frequenciaSegundaDuziaColuna,
-                Coluna3rd: frequenciaTerceiraDuziaColuna
-            },
-            DuziaLinha: {
-                Linha1st: frequenciaPrimeiraDuziaLinha,
-                Linha2nd: frequenciaSegundaDuziaLinha,
-                Linha3rd: frequenciaTerceiraDuziaLinha
-            }
-        },
-        Mensagem: {
-            tipo: tipo,
-            msg: msg
-        }
-    }
+    // let resultado = {
+    //     Frequencias: {
+    //         Cor: {
+    //             Preta: cor.Preta,
+    //             vermelha: cor.Vermelha,
+    //             Status: cor.Status
+    //         },
+    //         ParImpar: {
+    //             Par: parImpar.Par,
+    //             Impar: parImpar.Impar,
+    //             Status: parImpar.Status
+    //         },
+    //         BaixoAlto: {
+    //             NumeroBaixo: baixoAlto.NumeroBaixo,
+    //             NumeroAlto: baixoAlto.NumeroAlto,
+    //             Status: baixoAlto.Status
+    //         },
+    //         DuziaColuna: {
+    //             Coluna1st: duziaColuna.Coluna1st,
+    //             Coluna2nd: duziaColuna.Coluna2nd,
+    //             Coluna3rd: duziaColuna.Coluna3rd,
+    //             Status: duziaColuna.Status
+    //         },
+    //         DuziaLinha: {
+    //             Linha1st: duziaLinha.Linha1st,
+    //             Linha2nd: duziaLinha.Linha2nd,
+    //             Linha3rd: duziaLinha.Linha3rd,
+    //             Status: duziaLinha.Status
+    //         }
+    //     },
+    //     Status: {
+    //         tipo: tipo,
+    //         msg: msg
+    //     }
+    // }
+
+    // if (tipo == TIPO_MENSAGEM.Win) Restart();
+
+    // return resultado;
 }
 
 function Restart() {
