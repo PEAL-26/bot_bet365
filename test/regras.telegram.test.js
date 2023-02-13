@@ -28,18 +28,15 @@ async function testar() {
 
         let valorAleatorio = Math.floor(Math.random() * todosValores.length);
         let resultado = regras.AnalisarTodasRegras(todosValores[valorAleatorio], 'Roleta Teste');
-
-
-
         
         if (resultado.Status.tipo == 'confirmacao' && ultimaMensagemId != 0) {
-            await telegram.apagarMensagem(ultimaMensagemId);
+           // await telegram.apagarMensagem(ultimaMensagemId);
             console.error('Apagou mensagem', 'Id:' + ultimaMensagemId);
             ultimaMensagemId = 0;
         }
 
         if (resultado.Status.tipo != 'info') {
-            var resultadoTelegram = await telegram.enviarMensagem(resultado.Status.msg);
+         //   var resultadoTelegram = await telegram.enviarMensagem(resultado.Status.msg);
         }
 
         if (resultado.Status.tipo == 'confirmacao') {

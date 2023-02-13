@@ -1,18 +1,19 @@
-require('dotenv').config();
-const puppeteer = require('puppeteer');
+import dotenv from 'dotenv';
+import puppeteer from 'puppeteer';
 
-const USER = process.env.BET_USER
+dotenv.config();
+
+const USER = process.env.BET_USER;
 const PASSWORD = process.env.BET_PASSWORD;
 const URL = process.env.BET_URL;
 
 const LAUNCH_OPTIONS = {
     headless: false,
     timeout: 0,
-   /* executablePath: 'C:\\Program Files\\BraveSoftware\\Brave-Browser\\Application\\brave.exe',*/
     args: ['--no-sandbox', '--disable-setuid-sandbox']
 };
 
-async function Iniciar() {
+export async function Iniciar() {
     console.log('Iniciando...');
     const browser = await puppeteer.launch(LAUNCH_OPTIONS);
 
@@ -82,8 +83,17 @@ async function Iniciar() {
 
     //await page.waitForNavigation({ timeout: 0 });
 
-}
+    //Botão voltar para todas as roletas
+    {/* <a href="https://casino.bet365.com/home" class="inline-games-page-component__game-header-left-lobby-text" aria-label="Lobby">
+                            <span class="inline-games-page-component__game-header-left-arrow">
+                                    <img src="//content001.bet365.com/Casino/SGP/GamesPage/Chevron.svg" alt="Lobby">
+                            </span>
+                            
+                        </a> */}
 
-module.exports = {
-    Iniciar
+    //voltar depois da rodada ao vivo terminar
+    var selectorRodada = 'button[class="live-roulette-game-page__button"]';
+
+    //inatividade durante muito tempo
+    var selectorInatividade = 'button[class="live-roulette-game-page__button"]';
 }

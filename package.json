@@ -3,7 +3,9 @@
   "version": "1.0.0",
   "description": "Bot BET365",
   "main": "index.js",
+  "type": "module",
   "scripts": {
+    "dev": "nodemon src/index",
     "test": "mocha --watch"
   },
   "author": "PEAL",

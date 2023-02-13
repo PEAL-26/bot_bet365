@@ -1,11 +1,9 @@
-require('dotenv').config();
-const puppeteer = require('puppeteer');
-const telegram = require('./telegram-api');
-const regras = require('./regras');
-const bet = require('./bet-bot');
+// const telegram = require('./telegram-api');
+// const regras = require('./regras');
+import { Iniciar } from './bet-bot.js';
 
-async function main(){
-    bet = await bet.Iniciar();
+async function main() {
+    await Iniciar();
 }
 
 main();

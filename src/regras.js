@@ -50,10 +50,10 @@ function SequenciaCor(numero) {
     let numeroValido = VerificarNumeroValido(numero);
     if (numeroValido != true) return numeroValido;
 
-    let vermelha = [1, 3, 5, 7, 9, 12, 14, 16, 18, 19, 21, 23, 25, 27, 30, 32, 34, 36];
+    let Vermelha = [1, 3, 5, 7, 9, 12, 14, 16, 18, 19, 21, 23, 25, 27, 30, 32, 34, 36];
     let preta = [2, 4, 6, 8, 10, 11, 13, 15, 17, 20, 22, 24, 26, 28, 29, 31, 33, 35];
 
-    if (vermelha.includes(numero))
+    if (Vermelha.includes(numero))
         frequenciaCorVermelha++;
 
     if (preta.includes(numero))
@@ -493,60 +493,60 @@ function AnalisarTodasRegras(valor, roleta = '') {
         msg = parImpar?.Status?.msg;
     }
 
-    // if (baixoAlto?.Status?.tipo && baixoAlto?.Status?.tipo != TIPO_MENSAGEM.Analise) {
-    //     tipo = baixoAlto?.Status?.tipo;
-    //     msg = baixoAlto?.Status?.msg;
-    // }
+    if (baixoAlto?.Status?.tipo && baixoAlto?.Status?.tipo != TIPO_MENSAGEM.Analise) {
+        tipo = baixoAlto?.Status?.tipo;
+        msg = baixoAlto?.Status?.msg;
+    }
 
-    // if (duziaColuna?.Status?.tipo && duziaColuna?.Status?.tipo != TIPO_MENSAGEM.Analise) {
-    //     tipo = duziaColuna?.Status?.tipo;
-    //     msg = duziaColuna?.Status?.msg;
-    // }
+    if (duziaColuna?.Status?.tipo && duziaColuna?.Status?.tipo != TIPO_MENSAGEM.Analise) {
+        tipo = duziaColuna?.Status?.tipo;
+        msg = duziaColuna?.Status?.msg;
+    }
 
-    // if (duziaLinha?.Status?.tipo && duziaLinha?.Status?.tipo != TIPO_MENSAGEM.Analise) {
-    //     tipo = duziaLinha?.Status?.tipo;
-    //     msg = duziaLinha?.Status?.msg;
-    // }
+    if (duziaLinha?.Status?.tipo && duziaLinha?.Status?.tipo != TIPO_MENSAGEM.Analise) {
+        tipo = duziaLinha?.Status?.tipo;
+        msg = duziaLinha?.Status?.msg;
+    }
 
-    // let resultado = {
-    //     Frequencias: {
-    //         Cor: {
-    //             Preta: cor.Preta,
-    //             vermelha: cor.Vermelha,
-    //             Status: cor.Status
-    //         },
-    //         ParImpar: {
-    //             Par: parImpar.Par,
-    //             Impar: parImpar.Impar,
-    //             Status: parImpar.Status
-    //         },
-    //         BaixoAlto: {
-    //             NumeroBaixo: baixoAlto.NumeroBaixo,
-    //             NumeroAlto: baixoAlto.NumeroAlto,
-    //             Status: baixoAlto.Status
-    //         },
-    //         DuziaColuna: {
-    //             Coluna1st: duziaColuna.Coluna1st,
-    //             Coluna2nd: duziaColuna.Coluna2nd,
-    //             Coluna3rd: duziaColuna.Coluna3rd,
-    //             Status: duziaColuna.Status
-    //         },
-    //         DuziaLinha: {
-    //             Linha1st: duziaLinha.Linha1st,
-    //             Linha2nd: duziaLinha.Linha2nd,
-    //             Linha3rd: duziaLinha.Linha3rd,
-    //             Status: duziaLinha.Status
-    //         }
-    //     },
-    //     Status: {
-    //         tipo: tipo,
-    //         msg: msg
-    //     }
-    // }
+    let resultado = {
+        Frequencias: {
+            Cor: {
+                Preta: cor.Preta,
+                Vermelha: cor.Vermelha,
+                Status: cor.Status
+            },
+            ParImpar: {
+                Par: parImpar.Par,
+                Impar: parImpar.Impar,
+                Status: parImpar.Status
+            },
+            BaixoAlto: {
+                NumeroBaixo: baixoAlto.NumeroBaixo,
+                NumeroAlto: baixoAlto.NumeroAlto,
+                Status: baixoAlto.Status
+            },
+            DuziaColuna: {
+                Coluna1st: duziaColuna.Coluna1st,
+                Coluna2nd: duziaColuna.Coluna2nd,
+                Coluna3rd: duziaColuna.Coluna3rd,
+                Status: duziaColuna.Status
+            },
+            DuziaLinha: {
+                Linha1st: duziaLinha.Linha1st,
+                Linha2nd: duziaLinha.Linha2nd,
+                Linha3rd: duziaLinha.Linha3rd,
+                Status: duziaLinha.Status
+            }
+        },
+        Status: {
+            tipo: tipo,
+            msg: msg
+        }
+    }
 
-    // if (tipo == TIPO_MENSAGEM.Win) Restart();
+    if (tipo == TIPO_MENSAGEM.Win) Restart();
 
-    // return resultado;
+    return resultado;
 }
 
 function Restart() {
@@ -579,7 +579,7 @@ class Regras {
     SequenciaNumeroMesmaDuziaLinha(numero) { return SequenciaNumeroMesmaDuziaLinha(numero); }
 }
 
-module.exports = {
+export default {
     SequenciaCor,
     SequenciaNumeroParImpar,
     SequenciaNumeroBaixoAlto,
@@ -590,5 +590,5 @@ module.exports = {
     MensagemAnalisando,
     MensagemAnaliseConfirmada,
     MensagemFalha,
-    Regras
+    Regras: new Regras(),
 }
